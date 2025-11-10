@@ -1,34 +1,65 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+import { fetchStarredRepos } from './services/githubApi'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [repos, setRepos] = useState([])
+  const [page, setPage] = useState(1)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const loadRepos = async () => {
+      setLoading(true)
+      try {
+        const data = await fetchStarredRepos(page)
+        setRepos(prev => page === 1 ? data : [...prev, ...data])
+      } catch (error) {
+        console.error('Failed to fetch repos:', error)
+      }
+      setLoading(false)
+    }
+    loadRepos()
+  }, [page])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+        setPage(prev => prev + 1)
+      }
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className="app">
+      <header className="action-bar">
+        <h1>Trending Repos</h1>
+      </header>
+
+      <main className="repo-list">
+        {repos.map(repo => (
+          <div key={repo.id} className="repo-item">
+            <div className="repo-header">
+              <img src={repo.owner.avatar_url} alt={repo.owner.login} className="avatar" />
+              <div className="repo-info">
+                <h3 className="repo-name">{repo.name}</h3>
+                <p className="repo-owner">by {repo.owner.login}</p>
+              </div>
+            </div>
+            <p className="repo-description">{repo.description}</p>
+            <div className="repo-stats">
+              <span className="stars">⭐ {repo.stargazers_count}</span>
+            </div>
+          </div>
+        ))}
+        {loading && <p className="loading">Loading...</p>}
+      </main>
+
+      <footer className="footer">
+        <p>Aizzat bin Suhardi 2025</p>
+      </footer>
+    </div>
   )
 }
 
