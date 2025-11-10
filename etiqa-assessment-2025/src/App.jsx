@@ -39,7 +39,7 @@ function App() {
 
       <main className="repo-list">
         {repos.map(repo => (
-          <div key={repo.id} className="repo-item">
+          <a key={repo.id} href={repo.html_url} target="_blank" rel="noopener noreferrer" className="repo-item">
             <div className="repo-header">
               <img src={repo.owner.avatar_url} alt={repo.owner.login} className="avatar" />
               <div className="repo-info">
@@ -51,7 +51,7 @@ function App() {
             <div className="repo-stats">
               <span className="stars">⭐ {repo.stargazers_count}</span>
             </div>
-          </div>
+          </a>
         ))}
         {loading && <p className="loading">Loading...</p>}
       </main>
