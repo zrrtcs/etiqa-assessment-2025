@@ -1,19 +1,11 @@
-/**
- * Calculate date from N days ago
- * @param {number} days - Number of days in the past
- * @returns {string} - Formatted date string (YYYY-MM-DD)
- */
+// Get date N days ago in YYYY-MM-DD format
 export const getDateFromDaysAgo = (days) => {
   const date = new Date();
   date.setDate(date.getDate() - days);
   return date.toISOString().split('T')[0];
 };
 
-/**
- * Fetch most starred GitHub repos created in the last 10 days
- * @param {number} page - Page number for pagination (default: 1)
- * @returns {Promise<Array>} - Array of repository objects
- */
+// Fetch starred repos from GitHub API
 export const fetchStarredRepos = async (page = 1) => {
   const createdDate = getDateFromDaysAgo(10);
   const query = `sort=stars&order=desc&created:>=${createdDate}`;
